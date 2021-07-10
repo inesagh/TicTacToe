@@ -7,6 +7,7 @@ import java.util.Scanner;
 public class Main {
     static String grid = "";
     static int running = 0;
+    static boolean quit = false;
 
     public static void main(String[] args) {
         try {
@@ -28,50 +29,28 @@ public class Main {
             firstGrid.start();
             firstGrid.join();
 
-            Thread write = new Thread(() -> {
-                while (true) {
-                    try {
-                        String coordinates = "";
-                        coordinates = scanner.nextLine();
-                        OutputStream outputStream = socket.getOutputStream();
-                        ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
-                        objectOutputStream.writeObject(coordinates);
-                        System.out.println(running);
 
+            while (!quit) {
+                String coordinates = "";
+                coordinates = scanner.nextLine();
+                OutputStream outputStream = socket.getOutputStream();
+                ObjectOutputStream objectOutputStream = new ObjectOutputStream(outputStream);
+                objectOutputStream.writeObject(coordinates);
+                System.out.println(running);
 
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
+                InputStream inputStream = socket.getInputStream();
+                ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
+                grid = (String) objectInputStream.readObject();
+                System.out.println(grid);
+                if (grid.equals("x wins!") || grid.equals("o wins!") || grid.equals("draw")) {
+                    quit = true;
+//                    System.exit(0);
                 }
-            });
 
-            Thread read = new Thread(() -> {
-                while (true) {
-                    try {
-                        InputStream inputStream = socket.getInputStream();
-                        ObjectInputStream objectInputStream = new ObjectInputStream(inputStream);
-                        grid = (String) objectInputStream.readObject();
-                        System.out.println(grid);
-                        if (grid.equals("x wins!") || grid.equals("o wins!") || grid.equals("draw")) {
-                            System.exit(0);
-                        }
-                        running++;
-
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    } catch (ClassNotFoundException e) {
-                        e.printStackTrace();
-                    }
-                }
-            });
-
-            write.start();
-            read.start();
+            }
 
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (InterruptedException e) {
+        } catch (IOException | InterruptedException | ClassNotFoundException e) {
             e.printStackTrace();
         }
     }

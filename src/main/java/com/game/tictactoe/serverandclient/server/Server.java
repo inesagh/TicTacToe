@@ -14,6 +14,7 @@ public class Server {
     static boolean i = true;
     static String playersss = "";
 
+
     public static void main(String[] args) {
         Logic logic = new Logic();
         for (int i = 0; i < 3; i++) {
@@ -56,14 +57,6 @@ public class Server {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public static boolean sequence(String player){
-        if(!playersss.equals(player)){
-            playersss = player;
-            return true;
-        }
-        return false;
     }
 
 }
